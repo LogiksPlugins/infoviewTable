@@ -1,0 +1,28 @@
+{
+    "name": "Logiks InfoviewTable",
+    "version": "1.0.0",
+    "status": "alpha",
+    "type": "module",
+    "package":"olgks.infoviewTable",
+    "description": "This is a addon module to infoview. It allows to add grids and single view directly from sql into infoview.",
+    "keywords": "logiks,modules,infoview,infoviewTable",
+    "license": "MIT",
+    "marketid": "",
+    "homepage": "https://github.com/LogiksPlugins/infoviewTable",
+    "bugs": "https://github.com/LogiksPlugins/infoviewTable/issues",
+    "private": false,
+    "dependencies": {
+        "core": "+4.0.0",
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/LogiksPlugins/infoviewTable.git"
+    },
+    "authors": [
+        {
+            "name": "OpenLogiks Team",
+            "email": "admin@openlogiks.org",
+            "authorid":"olgksadmin"
+        }
+    ]
+}
