@@ -20,11 +20,27 @@ if(isset($_ENV['INFOVIEW']) && isset($_ENV['INFOVIEW']['config']) && isset($_ENV
   
   $dtuid=md5(microtime().implode(".",$duidArr));
   $dcode=$_ENV['INFOVIEW-REFHASH'];
+  $_REQUEST['REFID']=$dcode;
   
   switch(strtolower($_ENV['INFOVIEW']['type'])) {
     case "sql":
       $f=__DIR__."/ui/sql_{$_ENV['INFOVIEW']['uimode']}.php";
       if(file_exists($f) && isset($_ENV['INFOVIEW']['table']) && isset($_ENV['INFOVIEW']['cols']) && isset($_ENV['INFOVIEW']['where'])) {
+		if(!is_array($_ENV['INFOVIEW']['cols'])) {
+			$_ENV['INFOVIEW']['cols']=_replace($_ENV['INFOVIEW']['cols']);
+		} else {
+			foreach($_ENV['INFOVIEW']['cols'] as $a=>$b) {
+				$_ENV['INFOVIEW']['cols'][$a]=_replace($b);
+			}
+		}
+        if(!is_array($_ENV['INFOVIEW']['where'])) {
+			$_ENV['INFOVIEW']['where']=_replace($_ENV['INFOVIEW']['where']);
+		} else {
+			foreach($_ENV['INFOVIEW']['where'] as $a=>$b) {
+				$_ENV['INFOVIEW']['where'][$a]=_replace($b);
+			}
+		}
+        
         include $f;
       } else {
         echo "<h1 align=center>Sorry, defination error.</h1>";
