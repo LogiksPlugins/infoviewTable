@@ -11,7 +11,7 @@ switch($_REQUEST['action']){
         if(isset($src['unilinks'])) {
           $uniLinks=$src['unilinks'];
         }
-        
+
         $sql=_db()->_selectQ($src['table'],$src['cols']);
         if(is_array($src['where'])) {
           $sql->_where($src['where']);
@@ -35,7 +35,7 @@ switch($_REQUEST['action']){
         
         $data=$sql->_GET();
 //         var_dump(_db()->get_error());
-        
+
         if($data) {
           //printServiceMsg($data);
           foreach($data as $nx=>$row) {
