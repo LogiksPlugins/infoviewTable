@@ -21,6 +21,10 @@ if(isset($_ENV['INFOVIEW']) && isset($_ENV['INFOVIEW']['config']) && isset($_ENV
   $dtuid=md5(microtime().implode(".",$duidArr));
   $dcode=$_ENV['INFOVIEW-REFHASH'];
   $_REQUEST['REFID']=$dcode;
+  $slugs=_slug("a/srcfile/refid/subcat/subtype/code");
+  foreach($slugs as $a=>$b) {
+    $_REQUEST[$a]=$b;
+  }
 
   switch(strtolower($_ENV['INFOVIEW']['type'])) {
     case "sql":
