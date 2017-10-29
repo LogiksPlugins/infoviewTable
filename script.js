@@ -1,7 +1,12 @@
-$('.infoviewContainerTabs a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-  src=$($(e.target).attr("href"),".infoviewContainerTabs").find(".infoTableView");
-  loadInfoTable(src);
-})
+$(".infoviewContainerTabs").find(".infoTableView").each(function() {
+  src=$(this).closest(".tab-pane").attr("id");
+  $(".infoviewContainerTabs").find(".nav.nav-tabs").find("a[href='#"+src+"']").attr("data-onshowncallback","loadInfoTableCallback");
+});
+
+function loadInfoTableCallback(srcTag) {
+  srcPane=$($(srcTag).attr("href"),".infoviewContainerTabs").find(".infoTableView");
+  loadInfoTable(srcPane);
+}
 function loadInfoTableFirst(src) {
   if($(src).find("table.table tbody").children().length<=0) {
     loadInfoTable(src);
