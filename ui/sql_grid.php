@@ -21,7 +21,7 @@ $colsArr=explode(",",$_ENV['INFOVIEW']['cols']);
                     <?php
                     foreach($colsArr as $v){
                           $k=explode(".",$v);
-                          $k=explode("as",end($k));
+                          $k=explode("as ",end($k));
                           $k=_ling(end($k));
                         ?>
                         <th name='<?=$v?>'><?=toTitle($k)?></th>

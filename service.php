@@ -14,6 +14,14 @@ switch($_REQUEST['action']){
 
         $sql=_db()->_selectQ($src['table'],$src['cols']);
         if(is_array($src['where'])) {
+          foreach($src['where'] as $a=>$b) {
+            if($b=="RAW") {
+              unset($src['where'][$a]);
+              $src['where'][_replace($a)]=$b;
+            } else {
+              $src['where'][$a]=_replace($b);
+            }
+          }
           $sql->_where($src['where']);
         } else {
           $sql->_whereRAW(_replace($src['where']));
@@ -32,6 +40,12 @@ switch($_REQUEST['action']){
           $lt=100;
         }
         $sql->_limit($lt,$lt*$pg);
+
+        if(isset($src['DEBUG']) && $src['DEBUG']) {
+          echo "<tr><td colspan=100>";
+          echo $sql->_SQL();
+          echo "</td></tr>";
+        }
         
         $data=$sql->_GET();
 //         var_dump(_db()->get_error());
@@ -74,7 +88,7 @@ switch($_REQUEST['action']){
         if(isset($src['unilinks'])) {
           $uniLinks=$src['unilinks'];
         }
-        
+
         $sql=_db()->_selectQ($src['table'],$src['cols']);
         if(is_array($src['where'])) {
           $sql->_where($src['where']);
@@ -84,6 +98,13 @@ switch($_REQUEST['action']){
         if(isset($src['orderby']) && strlen($src['orderby'])>0) {
           $sql->_orderBy($src['orderby']);
         }
+        
+        if(isset($src['DEBUG']) && $src['DEBUG']) {
+          echo "<tr><td colspan=100>";
+          echo $sql->_SQL();
+          echo "</td></tr>";
+        }
+        
         $data=$sql->_GET();
 //         var_dump(_db()->get_error());
         if($data) {
@@ -112,7 +133,7 @@ switch($_REQUEST['action']){
     }
     break;
   case "createRecord":
-    
+
     break;
 }
 ?>

@@ -5,7 +5,12 @@ $(".infoviewContainerTabs").find(".infoTableView").each(function() {
 
 function loadInfoTableCallback(srcTag) {
   srcPane=$($(srcTag).attr("href"),".infoviewContainerTabs").find(".infoTableView");
-  loadInfoTable(srcPane);
+  cmd=srcPane.data('cmd');
+  if(typeof window[cmd]=='function') {
+    window[cmd](srcPane);
+  } else {
+    loadInfoTable(srcPane);
+  }
 }
 function loadInfoTableFirst(src) {
   if($(src).find("table.table tbody").children().length<=0) {
