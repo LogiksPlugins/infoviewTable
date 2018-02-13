@@ -4,11 +4,17 @@ if(!defined('ROOT')) exit('No direct script access allowed');
 //To be used in infoview
 //$slug=_slug("module/uitype/subcat");
 
+include_once __DIR__."/api.php";
+
 if(isset($_ENV['INFOVIEW']) && isset($_ENV['INFOVIEW']['config']) && isset($_ENV['INFOVIEW-REFHASH'])) {
 
   if(isset($_ENV['INFOVIEW']['vmode'])) $_ENV['INFOVIEW']['config']['vmode']=$_ENV['INFOVIEW']['vmode'];
   else $_ENV['INFOVIEW']['config']['vmode']="view";
 
+  if(isset($_ENV['INFOVIEW']['security'])) {
+    $_ENV['INFOVIEW']['config']['security']=$_ENV['INFOVIEW']['security'];
+  }
+  
   $_ENV['INFOVIEW']=$_ENV['INFOVIEW']['config'];
   if(!isset($_ENV['INFOVIEW']['type'])) $_ENV['INFOVIEW']['type']="sql";
   if(!isset($_ENV['INFOVIEW']['uimode'])) $_ENV['INFOVIEW']['uimode']="grid";
@@ -21,6 +27,9 @@ if(isset($_ENV['INFOVIEW']) && isset($_ENV['INFOVIEW']['config']) && isset($_ENV
   $dtuid=md5(microtime().implode(".",$duidArr));
   $dcode=$_ENV['INFOVIEW-REFHASH'];
   $_REQUEST['REFID']=$dcode;
+  $_ENV['INFOVIEW']['refid']=$_ENV['INFOVIEW-REFID'];
+  $_ENV['INFOVIEW']['refhash']=$_ENV['INFOVIEW-REFHASH'];
+  
   $slugs=_slug("a/srcfile/refid/subcat/subtype/code");
   foreach($slugs as $a=>$b) {
     $_REQUEST[$a]=$b;

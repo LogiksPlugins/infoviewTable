@@ -12,7 +12,7 @@ switch($_REQUEST['action']){
           $uniLinks=$src['unilinks'];
         }
 
-        $sql=_db()->_selectQ($src['table'],$src['cols']);
+        $sql=_db()->_selectQ($src['table'],$src['cols'],["blocked"=>'false']);
         if(is_array($src['where'])) {
           foreach($src['where'] as $a=>$b) {
             if($b=="RAW") {
@@ -40,6 +40,9 @@ switch($_REQUEST['action']){
           $lt=100;
         }
         $sql->_limit($lt,$lt*$pg);
+        
+        $allowEdit=checkUserRoles($src['security']['module'],$src['security']['activity'],"EDIT");
+        $allowDelete=checkUserRoles($src['security']['module'],$src['security']['activity'],"DELETE");
 
         if(isset($src['DEBUG']) && $src['DEBUG']) {
           echo "<tr><td colspan=100>";
@@ -50,12 +53,19 @@ switch($_REQUEST['action']){
         $data=$sql->_GET();
 //         var_dump(_db()->get_error());
 
-        if($data) {
+        if($data && count($data)>0) {
           //printServiceMsg($data);
+          $rowKey=array_keys($data[0])[0];
+          
           foreach($data as $nx=>$row) {
-            echo "<tr>";
+            echo "<tr data-refid='".md5($row[$rowKey])."'>";
             foreach($row as $a=>$b) {
-              $t=_ling($b);
+              if($a==$rowKey) continue;
+              if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$b)) {
+                  $t=_pDate($b);
+              } else {
+                  $t=_ling($b);
+              }
               if(array_key_exists($a,$uniLinks)) {
                 if(is_array($uniLinks[$a])) {
                   //"name"=>["type"=>"profile.customers","col"=>"id"]
@@ -71,6 +81,15 @@ switch($_REQUEST['action']){
                 echo "<td class='{$a}' data-name='{$a}' data-value='{$b}'>{$t}</td>";
               }
             }
+            
+            echo "<td class='col-actions actions'>";
+            if($allowEdit) {
+              echo "<i class='fa fa-pencil mouseAction pull-right' onclick='editInfoRecord(this)'></i>";
+            }
+            if($allowDelete) {
+              echo "<i class='fa fa-trash mouseAction pull-right' onclick='deleteInfoRecord(this)'></i>";
+            }
+            echo "</td>";
             echo "</tr>";
           }
         } else {
@@ -109,6 +128,11 @@ switch($_REQUEST['action']){
 //         var_dump(_db()->get_error());
         if($data) {
           foreach($data[0] as $a=>$b) {
+            if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$b)) {
+                $b=_pDate($b);
+            } else {
+                $b=_ling($b);
+            }
             $t=toTitle(_ling($a));
             if(array_key_exists($a,$uniLinks)) {
               if(is_array($uniLinks[$a])) {
@@ -132,8 +156,184 @@ switch($_REQUEST['action']){
       printServiceMsg("Request Method Error");
     }
     break;
-  case "createRecord":
+  case "create-record":
+    if(isset($_POST['dtuid'])) {
+      if(isset($_SESSION['INFOVIEWTABLE']) && isset($_SESSION['INFOVIEWTABLE'][$_POST['dtuid']])) {
+        $src=$_SESSION['INFOVIEWTABLE'][$_POST['dtuid']];
+        unset($_POST['dtuid']);
+        
+        $allowCreate=checkUserRoles($src['security']['module'],$src['security']['activity'],"CREATE");
+        if(!$allowCreate) {
+          printServiceMsg("Error, Record Creation is not permitted for you");
+          return;
+        }
+        
+        $formConfig=$src['form'];
+        if(strtolower($formConfig['source']['type'])=="sql") {
+          
+          $_REQUEST['REFID']=$src['refid'];
+          $_REQUEST['REFHASH']=$src['refhash'];
+          $_REQUEST['DATE']=date("Y-m-d");
+          $_REQUEST['DATETIME']=date("Y-m-d H:i:s");
+          
+          if(!isset($formConfig['autofill'])) $formConfig['autofill']=[];
+          foreach($formConfig['autofill'] as $key) {
+            if(isset($defaultArr[$key])) {
+              $_POST[$key]=$defaultArr[$key];
+            }
+          }
 
+          if(!isset($formConfig['forcefill'])) $formConfig['forcefill']=[];
+          foreach($formConfig['forcefill'] as $key=>$val) {
+            $_POST[$key]=_replace($val);
+          }
+          
+          if(!isset($formConfig['nofill'])) $formConfig['nofill']=[];
+          foreach($formConfig['nofill'] as $key) {
+            unset($cols[$key]);
+          }
+          
+          $fData=array_merge($_POST, [
+                    "guid"=>$_SESSION['SESS_GUID'],
+                    "created_by"=>$_SESSION['SESS_USER_ID'],
+                    "created_on"=>date("Y-m-d H:i:s"),
+                    "edited_by"=>$_SESSION['SESS_USER_ID'],
+                    "edited_on"=>date("Y-m-d H:i:s"),
+                  ]);
+          
+          $a=_db()->_insertQ1($formConfig['source']['table'],$fData)->_RUN();
+          if($a) {
+            printServiceMsg("Record Created Successully");
+          } else {
+            printServiceMsg("Error while creation"._db()->get_error());
+          }
+        } else {
+          printServiceMsg("Source type not supported");
+        }
+      } else {
+        printServiceMsg("Request Timed Out. Try reloading.");
+      }
+    } else {
+      printServiceMsg("Request Method Error");
+    }
+    break;
+   case "update-record":
+    if(isset($_POST['dtuid']) && isset($_POST['refid'])) {
+      if(isset($_SESSION['INFOVIEWTABLE']) && isset($_SESSION['INFOVIEWTABLE'][$_POST['dtuid']])) {
+        $src=$_SESSION['INFOVIEWTABLE'][$_POST['dtuid']];
+        unset($_POST['dtuid']);
+        
+        $refid=$_POST['refid'];
+        unset($_POST['refid']);
+        
+        $allowEdit=checkUserRoles($src['security']['module'],$src['security']['activity'],"EDIT");
+        if(!$allowEdit) {
+          printServiceMsg("Error, Record Updation is not permitted for you");
+          return;
+        }
+        
+        $formConfig=$src['form'];
+        if(strtolower($formConfig['source']['type'])=="sql") {
+          
+          $_REQUEST['REFID']=$src['refid'];
+          $_REQUEST['REFHASH']=$src['refhash'];
+          $_REQUEST['DATE']=date("Y-m-d");
+          $_REQUEST['DATETIME']=date("Y-m-d H:i:s");
+          
+          if(!isset($formConfig['autofill'])) $formConfig['autofill']=[];
+          foreach($formConfig['autofill'] as $key) {
+            if(isset($defaultArr[$key])) {
+              $_POST[$key]=$defaultArr[$key];
+            }
+          }
+
+          if(!isset($formConfig['forcefill'])) $formConfig['forcefill']=[];
+          foreach($formConfig['forcefill'] as $key=>$val) {
+            $_POST[$key]=_replace($val);
+          }
+          
+          if(!isset($formConfig['nofill'])) $formConfig['nofill']=[];
+          foreach($formConfig['nofill'] as $key) {
+            unset($cols[$key]);
+          }
+          
+          $fData=array_merge($_POST, [
+                    "edited_by"=>$_SESSION['SESS_USER_ID'],
+                    "edited_on"=>date("Y-m-d H:i:s"),
+                  ]);
+          $where=[
+            "md5(id)"=>$refid
+          ];
+          
+          foreach($fData as $a=>$b) {
+            if(strpos(strtolower($a),"date")!==false) {
+              $fData[$a]=_date($b);
+            }
+          }
+          
+          $a=_db()->_updateQ($formConfig['source']['table'],$fData,$where)->_RUN();
+          if($a) {
+            printServiceMsg("Record Updated Successully");
+          } else {
+            printServiceMsg("Error while creation"._db()->get_error());
+          }
+        } else {
+          printServiceMsg("Source type not supported");
+        }
+      } else {
+        printServiceMsg("Request Timed Out. Try reloading.");
+      }
+    } else {
+      printServiceMsg("Request Method Error");
+    }
+    break;
+  case "delete-record":
+    if(isset($_POST['dtuid']) && isset($_POST['refid'])) {
+      if(isset($_SESSION['INFOVIEWTABLE']) && isset($_SESSION['INFOVIEWTABLE'][$_POST['dtuid']])) {
+        $src=$_SESSION['INFOVIEWTABLE'][$_POST['dtuid']];
+        unset($_POST['dtuid']);
+        
+        $refid=$_POST['refid'];
+        unset($_POST['refid']);
+        
+        $allowDelete=checkUserRoles($src['security']['module'],$src['security']['activity'],"DELETE");
+        if(!$allowDelete) {
+          printServiceMsg("Error, Record Deletion is not permitted for you");
+          return;
+        }
+        
+        $formConfig=$src['form'];
+        if(strtolower($formConfig['source']['type'])=="sql") {
+          
+          $_REQUEST['REFID']=$src['refid'];
+          $_REQUEST['REFHASH']=$src['refhash'];
+          $_REQUEST['DATE']=date("Y-m-d");
+          $_REQUEST['DATETIME']=date("Y-m-d H:i:s");
+          
+          $fData=[
+                  "blocked"=>"true",
+                  "edited_by"=>$_SESSION['SESS_USER_ID'],
+                  "edited_on"=>date("Y-m-d H:i:s"),
+                ];
+          $where=[
+            "md5(id)"=>$refid
+          ];
+          
+          $a=_db()->_updateQ($formConfig['source']['table'],$fData,$where)->_RUN();
+          if($a) {
+            printServiceMsg("Record Deleted Successully");
+          } else {
+            printServiceMsg("Error while creation"._db()->get_error());
+          }
+        } else {
+          printServiceMsg("Source type not supported");
+        }
+      } else {
+        printServiceMsg("Request Timed Out. Try reloading.");
+      }
+    } else {
+      printServiceMsg("Request Method Error");
+    }
     break;
 }
 ?>

@@ -35,6 +35,7 @@ function loadInfoTable(src) {
 function reloadInfoTable(src) {
   $(src).find("table.table tbody").html("");
   $(src).data("page",0);
+  $(src).find(".info-form").find("input[name=refid]").detach();
   loadInfoTable(src);
 }
 function loadMore(src) {
@@ -43,4 +44,61 @@ function loadMore(src) {
   nx++;
   $(src).data("page",nx);
   loadInfoTable(src);
+}
+function submitInfoForm(src) {
+  frm=$(src).closest(".info-form");
+  q=["dtuid="+frm.find(">tr").data("refhash")];err=false;
+  $("input[name],select[name],textarea[name]",frm).each(function(a,b) {
+    if($(this).attr("required")!=null && ($(this).attr("required")===true || $(this).attr("required").length>1)) {
+      if($(this).val()==null || $(this).val().length<=0) {
+        err=$(this).attr("name")+" can not be empty";
+      }
+    }
+    q.push($(this).attr("name")+"="+encodeURIComponent($(this).val()));
+  });
+  if(err===false) {
+    if(frm.find("input[name=refid]").length>0) {
+      lx=_service("infoviewTable","update-record");
+    } else {
+      lx=_service("infoviewTable","create-record");
+    }
+    processAJAXPostQuery(lx,q.join("&"),function(ans) {
+      ans=ans.Data;
+      if(ans.toLowerCase().indexOf('error')>=0) {
+        lgksToast(ans);
+      } else {
+        $("input[name],select[name],textarea[name]",frm).each(function() {
+          $(this).val($(this).data('value'));
+        });
+        reloadInfoTable($(src).closest(".infoTableView"));
+      }
+    },"json");
+  } else {
+    lgksToast(err);
+  }
+}
+function editInfoRecord(src) {
+  frm=$(src).closest(".infoview-table table").find(".info-form");
+  tr=$(src).closest("tr");
+  tr.find('td[data-name]').each(function() {
+	  nm=$(this).data("name");
+    $("input[name='"+nm+"'],select[name='"+nm+"'],textarea[name='"+nm+"']").val($(this).text());
+  });
+  frm.find("input[name=refid]").detach();
+  frm.append("<input type='hidden' name='refid' value='"+tr.data("refid")+"' />");
+}
+function deleteInfoRecord(src) {
+  frm=$(src).closest(".infoview-table table").find(".info-form");
+  tr=$(src).closest("tr");
+  q=["dtuid="+frm.find(">tr").data("refhash")];
+  q.push("refid="+tr.data("refid"));
+  processAJAXPostQuery(_service("infoviewTable","delete-record"),q.join("&"),function(ans) {
+       ans=ans.Data;
+      if(ans.toLowerCase().indexOf('error')>=0) {
+        lgksToast(ans);
+      } else {
+        tr.detach();
+        //reloadInfoTable($(src).closest(".infoTableView"));
+      }
+  },"json");
 }

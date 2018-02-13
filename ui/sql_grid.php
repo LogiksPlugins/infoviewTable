@@ -2,12 +2,13 @@
 if(!defined('ROOT')) exit('No direct script access allowed');
 
 $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
+// printArray($_ENV['INFOVIEW']);
 
 $colsArr=explode(",",$_ENV['INFOVIEW']['cols']);
 ?>
 <div id='infoviewTable_<?=$dtuid?>' class="row infoTableView infoTableGrid infoOnOpen" 
       data-dcode='<?=$dcode?>' data-dtuid='<?=$dtuid?>' data-page=0 data-limit=20 data-ui="grid">
-    <div class='col-md-12 table-responsive'>
+    <div class='col-md-12 table-responsive infoview-table'>
         <?php
           if(isset($_ENV['INFOVIEW']['buttons']) && is_array($_ENV['INFOVIEW']['buttons'])) {
             echo "<div class='form-actions text-right'>";
@@ -19,15 +20,24 @@ $colsArr=explode(",",$_ENV['INFOVIEW']['cols']);
             <thead>
                 <tr>
                     <?php
-                    foreach($colsArr as $v){
+                    foreach($colsArr as $n=>$v) {
+                          $xtras="";
+                      
                           $k=explode(".",$v);
                           $k=explode("as ",end($k));
                           $k=_ling(end($k));
+                          if($n==0) {
+                            $xtras="width=100px";
+                            continue;
+                          } else {
+                            
+                          }
                         ?>
-                        <th name='<?=$v?>'><?=toTitle($k)?></th>
+                        <th name='<?=$v?>' <?=$xtras?> ><?=toTitle($k)?></th>
                         <?php
                     }
                     ?>
+                    <th class='actions'>-</th>
                 </tr>
                 <th class='filters hidden'>
                     
@@ -37,6 +47,11 @@ $colsArr=explode(",",$_ENV['INFOVIEW']['cols']);
               
             </tbody>
             <tfoot class='info-form'>
+              <?php
+                if(checkUserRoles($_ENV['INFOVIEW']['security']['module'],$_ENV['INFOVIEW']['security']['activity'],"CREATE")) {
+                  echo generateInfoTableForm($_ENV['INFOVIEW'],$dtuid);
+                }
+              ?>
             </tfoot>
             <tfoot class='info-pagination'>
             </tfoot>
