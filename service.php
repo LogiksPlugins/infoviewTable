@@ -12,7 +12,8 @@ switch($_REQUEST['action']){
           $uniLinks=$src['unilinks'];
         }
 
-        $sql=_db()->_selectQ($src['table'],$src['cols'],["blocked"=>'false']);
+        $tbl1=current(explode(",",$src['table']));
+        $sql=_db()->_selectQ($src['table'],$src['cols'],["{$tbl1}.blocked"=>'false']);
         if(is_array($src['where'])) {
           foreach($src['where'] as $a=>$b) {
             if($b=="RAW") {
