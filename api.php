@@ -62,7 +62,7 @@ if(!function_exists("generateInfoForm")) {
       $html[]=getInfoFieldCol(end($key), $f);
     }
     if(count($_ENV['INFOVIEW']['form']['fields'])<count($colsArr)) {
-      $html[]="<td class='info-col-actions' colspan='".(count($colsArr)-count($_ENV['INFOVIEW']['form']['fields'])+1)."'>".
+      $html[]="<td class='info-col-actions' colspan='".(count($colsArr)-count($_ENV['INFOVIEW']['form']['fields'])+1)."' width=0px>".
               "<button class='btn btn-primary' onclick='submitInfoForm(this)'><i class='fa fa-save'></i></button>".
               "</td>";
     }
@@ -76,7 +76,8 @@ if(!function_exists("generateInfoForm")) {
           "fieldkey"=>$fkey,
           "required"=> false,
           "type"=>"text",
-          "width"=>1,
+          "width"=>"auto",
+          "span"=>1,
           "placeholder"=>toTitle($fieldConfig['label']),
         ],$fieldConfig);
     if($fieldConfig['required']) {
@@ -85,7 +86,7 @@ if(!function_exists("generateInfoForm")) {
     
     $html=getFormField($fieldConfig,"");
 //     $html="<input type='text' name='{$fkey}' class='form-control' data-value='' placeholder='{$fieldConfig['label']}' />";
-    return "<td class='infotable-col infotable-col-{$fkey} {$fieldConfig['type']}' colspan='{$fieldConfig['width']}'>".$html."</td>";
+    return "<td class='infotable-col infotable-col-{$fkey} {$fieldConfig['type']}' width='{$fieldConfig['width']}' colspan='{$fieldConfig['span']}'>".$html."</td>";
   }
 }
 

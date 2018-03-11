@@ -53,7 +53,22 @@ switch($_REQUEST['action']){
         
         $data=$sql->_GET();
 //         var_dump(_db()->get_error());
-
+        
+        $colMap=[];
+        foreach($src['columns'] as $c) {
+          $k="";$v="";
+          $c=explode(".",$c);
+          $c=end($c);
+          if(strpos($c," as ")>0) {
+            $c=explode(" as ",$c);
+            $k=$c[1];
+            $v=$c[0];
+          } else {
+            $k=$v=$c;
+          }
+          $colMap[$k]=$v;
+        }
+        
         if($data && count($data)>0) {
           //printServiceMsg($data);
           $rowKey=array_keys($data[0])[0];
@@ -62,10 +77,15 @@ switch($_REQUEST['action']){
             echo "<tr data-refid='".md5($row[$rowKey])."'>";
             foreach($row as $a=>$b) {
               if($a==$rowKey) continue;
+              
+              $a=$colMap[$a];
+              
               if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$b)) {
                   $t=_pDate($b);
               } else {
                   $t=_ling($b);
+                
+                  $t=str_replace("\\n","<br>\n",$t);
               }
               if(array_key_exists($a,$uniLinks)) {
                 if(is_array($uniLinks[$a])) {
@@ -201,9 +221,25 @@ switch($_REQUEST['action']){
                     "edited_by"=>$_SESSION['SESS_USER_ID'],
                     "edited_on"=>date("Y-m-d H:i:s"),
                   ]);
+          foreach($formConfig['fields'] as $a=>$b) {
+            if(isset($fData[$a]) && isset($b['type'])) {
+              switch(strtolower($b['type'])) {
+                case "date":
+                  $fData[$a]=processDate($fData[$a]);
+                  break;
+                case "datetime":
+                  $fData[$a]=processDateTime($fData[$a]);
+                  break;
+              }
+            }
+          }
           
           $a=_db()->_insertQ1($formConfig['source']['table'],$fData)->_RUN();
           if($a) {
+						if(!isset($_REQUEST['refid'])) {
+							$_REQUEST['refid']=md5(_db()->get_insertID());
+						}
+            executeInfoviewTableHook("postsubmit",$src);
             printServiceMsg("Record Created Successully");
           } else {
             printServiceMsg("Error while creation"._db()->get_error());
@@ -266,14 +302,22 @@ switch($_REQUEST['action']){
             "md5(id)"=>$refid
           ];
           
-          foreach($fData as $a=>$b) {
-            if(strpos(strtolower($a),"date")!==false) {
-              $fData[$a]=_date($b);
+          foreach($formConfig['fields'] as $a=>$b) {
+            if(isset($fData[$a]) && isset($b['type'])) {
+              switch(strtolower($b['type'])) {
+                case "date":
+                  $fData[$a]=processDate($fData[$a]);
+                  break;
+                case "datetime":
+                  $fData[$a]=processDateTime($fData[$a]);
+                  break;
+              }
             }
           }
           
           $a=_db()->_updateQ($formConfig['source']['table'],$fData,$where)->_RUN();
           if($a) {
+            executeInfoviewTableHook("postsubmit",$src);
             printServiceMsg("Record Updated Successully");
           } else {
             printServiceMsg("Error while creation"._db()->get_error());
@@ -322,6 +366,7 @@ switch($_REQUEST['action']){
           
           $a=_db()->_updateQ($formConfig['source']['table'],$fData,$where)->_RUN();
           if($a) {
+            executeInfoviewTableHook("postsubmit",$src);
             printServiceMsg("Record Deleted Successully");
           } else {
             printServiceMsg("Error while creation"._db()->get_error());
@@ -337,4 +382,54 @@ switch($_REQUEST['action']){
     }
     break;
 }
+function processDate($date) {
+  $date=str_replace("/","-",$date);
+  if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$date)) {//d-m-Y
+      return $date;
+  } elseif (preg_match("/^(0[0-9]|[1-2][0-9]|3[0-1])-(0[1-9]|1[0-2])-[0-9]{4}$/",$date)) {//Y-m-d
+      return _date($date,"d-m-Y","Y-m-d");
+  }
+  return $date;
+}
+function processDateTime($datetime) {
+  $dt=explode(" ",$datetime);
+  if(count($dt)<=1) {
+    $dt=explode("T",$datetime);
+  }
+  $dt[0]=processDate($dt[0]);
+  return "{$dt[0]} {$dt[1]}";
+}
+
+function executeInfoviewTableHook($state,$formConfig) {
+		if(!isset($formConfig['hooks']) || !is_array($formConfig['hooks'])) return false;
+		$state=strtolower($state);
+
+		if(isset($formConfig['hooks'][$state]) && is_array($formConfig['hooks'][$state])) {
+			$postCFG=$formConfig['hooks'][$state];
+
+			if(isset($postCFG['modules'])) {
+				loadModules($postCFG['modules']);
+			}
+			if(isset($postCFG['api'])) {
+				if(!is_array($postCFG['api'])) $postCFG['api']=explode(",",$postCFG['api']);
+				foreach ($postCFG['api'] as $apiModule) {
+					loadModuleLib($apiModule,'api');
+				}
+			}
+			if(isset($postCFG['helpers'])) {
+				loadHelpers($postCFG['helpers']);
+			}
+			if(isset($postCFG['method'])) {
+				if(!is_array($postCFG['method'])) $postCFG['method']=explode(",",$postCFG['method']);
+				foreach($postCFG['method'] as $m) call_user_func($m,$_ENV['FORM-HOOK-PARAMS']);
+			}
+			if(isset($postCFG['file'])) {
+				if(!is_array($postCFG['file'])) $postCFG['file']=explode(",",$postCFG['file']);
+				foreach($postCFG['file'] as $m) {
+					if(file_exists($m)) include $m;
+					elseif(file_exists(APPROOT.$m)) include APPROOT.$m;
+				}
+			}
+		}
+	}
 ?>

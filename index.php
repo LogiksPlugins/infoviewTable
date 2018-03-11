@@ -30,6 +30,15 @@ if(isset($_ENV['INFOVIEW']) && isset($_ENV['INFOVIEW']['config']) && isset($_ENV
   $_ENV['INFOVIEW']['refid']=$_ENV['INFOVIEW-REFID'];
   $_ENV['INFOVIEW']['refhash']=$_ENV['INFOVIEW-REFHASH'];
   
+  if(isset($_SESSION['INFOVIEW'][$_ENV['FORMKEY']])) {
+    if(isset($_SESSION['INFOVIEW'][$_ENV['FORMKEY']]['hooks'])) {
+      $_ENV['INFOVIEW']['hooks']=$_SESSION['INFOVIEW'][$_ENV['FORMKEY']]['hooks'];
+    }
+    if(isset($_SESSION['INFOVIEW'][$_ENV['FORMKEY']]['srckey'])) {
+      $_ENV['INFOVIEW']['srckey']=$_SESSION['INFOVIEW'][$_ENV['FORMKEY']]['srckey'];
+    }
+  }
+  
   $slugs=_slug("a/srcfile/refid/subcat/subtype/code");
   foreach($slugs as $a=>$b) {
     $_REQUEST[$a]=$b;

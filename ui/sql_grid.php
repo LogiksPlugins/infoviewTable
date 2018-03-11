@@ -1,10 +1,12 @@
 <?php
 if(!defined('ROOT')) exit('No direct script access allowed');
 
+$colsArr=explode(",",$_ENV['INFOVIEW']['cols']);
+
+$_ENV['INFOVIEW']['columns']=$colsArr;
+
 $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
 // printArray($_ENV['INFOVIEW']);
-
-$colsArr=explode(",",$_ENV['INFOVIEW']['cols']);
 ?>
 <div id='infoviewTable_<?=$dtuid?>' class="row infoTableView infoTableGrid infoOnOpen" 
       data-dcode='<?=$dcode?>' data-dtuid='<?=$dtuid?>' data-page=0 data-limit=20 data-ui="grid">
@@ -24,16 +26,17 @@ $colsArr=explode(",",$_ENV['INFOVIEW']['cols']);
                           $xtras="";
                       
                           $k=explode(".",$v);
-                          $k=explode("as ",end($k));
-                          $k=_ling(end($k));
+                          $k=explode(" as ",end($k));
+                          $k1=_ling(end($k));
                           if($n==0) {
                             $xtras="width=100px";
                             continue;
                           } else {
                             
                           }
+                          $nm=$k[0];
                         ?>
-                        <th name='<?=$v?>' <?=$xtras?> ><?=toTitle($k)?></th>
+                        <th name='<?=$nm?>' <?=$xtras?> ><?=toTitle($k1)?></th>
                         <?php
                     }
                     ?>
@@ -46,15 +49,17 @@ $colsArr=explode(",",$_ENV['INFOVIEW']['cols']);
             <tbody>
               
             </tbody>
-            <tfoot class='info-form'>
+            <tfoot class='info-pagination'>
+            </tfoot>
+        </table>
+        <table class="table table-condensed">
+          <tfoot class='info-form'>
               <?php
                 if(checkUserRoles($_ENV['INFOVIEW']['security']['module'],$_ENV['INFOVIEW']['security']['activity'],"CREATE")) {
                   echo generateInfoTableForm($_ENV['INFOVIEW'],$dtuid);
                 }
               ?>
-            </tfoot>
-            <tfoot class='info-pagination'>
-            </tfoot>
+          </tfoot>
         </table>
     </div>
 </div>
