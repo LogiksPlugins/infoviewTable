@@ -54,6 +54,16 @@ if(!function_exists("generateInfoForm")) {
       
       $_SESSION['INFOVIEWTABLE'][$dtuid]['form']=$_ENV['INFOVIEW']['form'];
     }
+    if(isset($_SESSION['INFOVIEWTABLE'][$dtuid]['form']['forcefill'])) {
+      if(isset($_SESSION['INFOVIEW'][$_ENV['FORMKEY']]['data'])) {
+        foreach($_SESSION['INFOVIEWTABLE'][$dtuid]['form']['forcefill'] as $col=>$rule) {
+          $rule=substr($rule,1,strlen($rule)-2);
+          if(isset($_SESSION['INFOVIEW'][$_ENV['FORMKEY']]['data'][$rule])) {
+            $_SESSION['INFOVIEWTABLE'][$dtuid]['form']['forcefill'][$col]=$_SESSION['INFOVIEW'][$_ENV['FORMKEY']]['data'][$rule];
+          }
+        } 
+      }
+    }
     
     $html=["<tr data-refhash='{$dtuid}'>"];
     foreach($_ENV['INFOVIEW']['form']['fields'] as $key=>$f) {
