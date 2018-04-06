@@ -64,7 +64,7 @@ if(!function_exists("generateInfoForm")) {
         } 
       }
     }
-    
+
     $html=["<tr data-refhash='{$dtuid}'>"];
     foreach($_ENV['INFOVIEW']['form']['fields'] as $key=>$f) {
       $key=current(explode(" ",$key));
@@ -75,6 +75,12 @@ if(!function_exists("generateInfoForm")) {
       $html[]="<td class='info-col-actions' colspan='".(count($colsArr)-count($_ENV['INFOVIEW']['form']['fields'])+1)."' width=0px>".
               "<button class='btn btn-primary' onclick='submitInfoForm(this)'><i class='fa fa-save'></i></button>".
               "</td>";
+    } else {
+      $html[]="</tr><tr>";
+      $html[]="<td class='info-col-actions text-right' colspan='100' width=0px>".
+              "<button class='btn btn-primary' onclick='submitInfoForm(this)'><i class='fa fa-save'></i> "._ling("Save")."</button>".
+              "</td>";
+      $html[]="</tr>";
     }
     $html[]="</tr>";
     return implode("",$html);
