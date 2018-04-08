@@ -93,7 +93,7 @@ function deleteInfoRecord(src) {
 	if(ans) {
 			frm=$(src).closest(".infoview-table").find(".info-form");
 		  tr=$(src).closest("tr");
-		  q=["dtuid="+frm.find(">tr").data("refhash")];
+		  q=["dtuid="+frm.closest(".infoTableView").data("refhash")];
 		  q.push("refid="+tr.data("refid"));
 		  processAJAXPostQuery(_service("infoviewTable","delete-record"),q.join("&"),function(ans) {
 		       ans=ans.Data;
