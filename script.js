@@ -1,7 +1,12 @@
-$(".infoviewContainerTabs").find(".infoTableView").each(function() {
-  src=$(this).closest(".tab-pane").attr("id");
-  $(".infoviewContainerTabs").find(".nav.nav-tabs").find("a[href='#"+src+"']").attr("data-onshowncallback","loadInfoTableCallback");
+$(function() {
+  initInfoviewTableUI();
 });
+function initInfoviewTableUI() {
+  $(".infoviewContainerTabs").find(".infoTableView").each(function() {
+    src=$(this).closest(".tab-pane").attr("id");
+    $(".infoviewContainerTabs").find(".nav.nav-tabs").find("a[href='#"+src+"']").attr("data-onshowncallback","loadInfoTableCallback");
+  });
+}
 
 function loadInfoTableCallback(srcTag) {
   srcPane=$($(srcTag).attr("href"),".infoviewContainerTabs").find(".infoTableView");

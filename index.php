@@ -29,7 +29,7 @@ if(isset($_ENV['INFOVIEW']) && isset($_ENV['INFOVIEW']['config']) && isset($_ENV
   $_REQUEST['REFID']=$dcode;
   $_ENV['INFOVIEW']['refid']=$_ENV['INFOVIEW-REFID'];
   $_ENV['INFOVIEW']['refhash']=$_ENV['INFOVIEW-REFHASH'];
-  
+
   if(isset($_SESSION['INFOVIEW'][$_ENV['FORMKEY']])) {
     if(isset($_SESSION['INFOVIEW'][$_ENV['FORMKEY']]['hooks'])) {
       $_ENV['INFOVIEW']['hooks']=$_SESSION['INFOVIEW'][$_ENV['FORMKEY']]['hooks'];
@@ -44,7 +44,7 @@ if(isset($_ENV['INFOVIEW']) && isset($_ENV['INFOVIEW']['config']) && isset($_ENV
     $_REQUEST[$a]=$b;
   }
   if(is_numeric($_REQUEST['refid'])) $_REQUEST['refid']=md5($_REQUEST['refid']);
-
+  
   switch(strtolower($_ENV['INFOVIEW']['type'])) {
     case "sql":
       $f=__DIR__."/ui/sql_{$_ENV['INFOVIEW']['uimode']}.php";
@@ -68,6 +68,7 @@ if(isset($_ENV['INFOVIEW']) && isset($_ENV['INFOVIEW']['config']) && isset($_ENV
             }
     			}
     		}
+
         include $f;
       } else {
         echo "<h1 align=center>Sorry, defination error.</h1>";
@@ -92,7 +93,8 @@ if(isset($_ENV['INFOVIEW']) && isset($_ENV['INFOVIEW']['config']) && isset($_ENV
 if(!isset($_ENV['INFOVIEWLOADED'])) {
   $_ENV['INFOVIEWLOADED']=true;
 
-  echo _css("infoviewTable");
-  echo _js("infoviewTable");
+  echo _css(["bootstrap.datetimepicker","infoviewTable"]);
+  echo _js(["moment","bootstrap.datetimepicker","infoviewTable"]);
+  echo "<script>if(typeof initInfoviewTableUI=='function') initInfoviewTableUI();</script>";
 }
 ?>
