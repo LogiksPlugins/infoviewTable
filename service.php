@@ -421,7 +421,7 @@ function executeInfoviewTableHook($state,$formConfig) {
 			}
 			if(isset($postCFG['method'])) {
 				if(!is_array($postCFG['method'])) $postCFG['method']=explode(",",$postCFG['method']);
-				foreach($postCFG['method'] as $m) call_user_func($m,$_ENV['FORM-HOOK-PARAMS']);
+				foreach($postCFG['method'] as $m) call_user_func($m,$formConfig);
 			}
 			if(isset($postCFG['file'])) {
 				if(!is_array($postCFG['file'])) $postCFG['file']=explode(",",$postCFG['file']);
