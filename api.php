@@ -95,6 +95,7 @@ if(!function_exists("generateInfoForm")) {
           "width"=>"auto",
           "span"=>1,
           "placeholder"=>toTitle($fieldConfig['label']),
+          "tooltip"=>"",
         ],$fieldConfig);
     if($fieldConfig['required']) {
       $fieldConfig['placeholder'].=" *";
@@ -102,7 +103,7 @@ if(!function_exists("generateInfoForm")) {
     
     $html=getFormField($fieldConfig,"");
 //     $html="<input type='text' name='{$fkey}' class='form-control' data-value='' placeholder='{$fieldConfig['label']}' />";
-    return "<td class='infotable-col infotable-col-{$fkey} {$fieldConfig['type']}' width='{$fieldConfig['width']}' colspan='{$fieldConfig['span']}'>".$html."</td>";
+    return "<td class='infotable-col infotable-col-{$fkey} {$fieldConfig['type']}' width='{$fieldConfig['width']}' colspan='{$fieldConfig['span']}' title='{$fieldConfig['tooltip']}'>".$html."</td>";
   }
 }
 
