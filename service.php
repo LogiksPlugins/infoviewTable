@@ -111,6 +111,9 @@ switch($_REQUEST['action']){
             }
             
             echo "<td class='col-actions actions'>";
+            if(isset($src['buttons']) && is_array($src['buttons'])) {
+              echo getInfoViewTableActions($src['buttons']);
+            }
             if($allowEdit) {
               echo "<i class='fa fa-pencil mouseAction pull-right' onclick='editInfoRecord(this)'></i>";
             }
