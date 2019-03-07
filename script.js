@@ -35,7 +35,71 @@ function loadInfoTable(src) {
       "&page="+$(src).data("page")+"&limit="+$(src).data("limit");
   $(src).find("table.table tbody").load(lx,function(ans) {
 //       console.log("LOADED");
-  });
+        initInfoViewTableActions($(src).find("table.table tbody"));
+    });
+}
+function initInfoViewTableActions(refDiv) {
+  $("*[cmd]",".infoviewContainer").click(function(e) {
+      cmd=$(this).attr("cmd");
+      cmdOriginalX=cmd;
+      cmd=cmd.split("@");
+      cmd=cmd[0];
+      src=this;
+      
+      parentObject=$(src).closest(".infoTableView");
+      if(parentObject.length<=0) {
+        parentObject=$(src).closest(".infoviewContainer");
+      }
+      hash=parentObject.data('dcode');
+      gkey=parentObject.data('dtuid');
+      title=$(src).text();
+      if(title==null || title.length<=0) {
+        title=$(src).attr("title");
+      }
+      if(title==null || title.length<=0) {
+        title="Dialog";
+      }
+      
+      switch(cmd) {
+            case "forms":case "reports":case "infoview":
+              cmdX=cmdOriginalX.split("@");
+              if(cmdX[1]!=null) {
+                cmdX[1]=cmdX[1].replace("{hashid}",hash).replace("{gkey}",gkey);
+
+                lgksOverlayFrame(_link("modules/"+cmd+"/"+cmdX[1]),title,function() {
+                      hideLoader();
+                    });
+              }
+            break;
+            case "page":
+              cmdX=cmdOriginalX.split("@");
+              if(cmdX[1]!=null) {
+                cmdX[1]=cmdX[1].replace("{hashid}",hash).replace("{gkey}",gkey);
+                window.location=_link("modules/"+cmdX[1]);
+              }
+              break;
+            case "module":case "popup":
+              cmdX=cmdOriginalX.split("@");
+              if(cmdX[1]!=null) {
+                cmdX[1]=cmdX[1].replace("{hashid}",hash).replace("{gkey}",gkey);
+
+                if(cmd=="module" || cmd=="modules") {
+                  top.openLinkFrame(title,_link("modules/"+cmdX[1]),true);
+                } else {
+                  lgksOverlayFrame(_link("popup/"+cmdX[1]),title,function() {
+                      hideLoader();
+                    });
+                }
+              }
+            break;
+            default:
+              if(typeof window[cmd]=="function") {
+                window[cmd](src);
+              } else {
+                console.warn("Report CMD not found : "+cmd);
+              }
+        }
+      });
 }
 function reloadInfoTable(src) {
   $(src).find("table.table tbody").html("");
@@ -95,20 +159,20 @@ function editInfoRecord(src) {
 }
 function deleteInfoRecord(src) {
   lgksConfirm("Sure about deleting the record","Delete !!!",function(ans) {
-	if(ans) {
-			frm=$(src).closest(".infoview-table").find(".info-form");
-		  tr=$(src).closest("tr");
-		  q=["dtuid="+frm.closest(".infoTableView").data("refhash")];
-		  q.push("refid="+tr.data("refid"));
-		  processAJAXPostQuery(_service("infoviewTable","delete-record"),q.join("&"),function(ans) {
-		       ans=ans.Data;
-		      if(ans.toLowerCase().indexOf('error')>=0) {
-		        lgksToast(ans);
-		      } else {
-		        tr.detach();
-		        //reloadInfoTable($(src).closest(".infoTableView"));
-		      }
-		  },"json");
-	}
-});
+  	if(ans) {
+  			frm=$(src).closest(".infoview-table").find(".info-form");
+  		  tr=$(src).closest("tr");
+  		  q=["dtuid="+frm.closest(".infoTableView").data("dtuid")];
+  		  q.push("refid="+tr.data("refid"));
+  		  processAJAXPostQuery(_service("infoviewTable","delete-record"),q.join("&"),function(ans) {
+  		       ans=ans.Data;
+  		      if(ans.toLowerCase().indexOf('error')>=0) {
+  		        lgksToast(ans);
+  		      } else {
+  		        tr.detach();
+  		        //reloadInfoTable($(src).closest(".infoTableView"));
+  		      }
+  		  },"json");
+  	}
+  });
 }

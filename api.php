@@ -105,6 +105,35 @@ if(!function_exists("generateInfoForm")) {
 //     $html="<input type='text' name='{$fkey}' class='form-control' data-value='' placeholder='{$fieldConfig['label']}' />";
     return "<td class='infotable-col infotable-col-{$fkey} {$fieldConfig['type']}' width='{$fieldConfig['width']}' colspan='{$fieldConfig['span']}' title='{$fieldConfig['tooltip']}'>".$html."</td>";
   }
+
+  function getInfoViewTableActions($actions=[]) {
+    $html="";
+    foreach ($actions as $key => $button) {
+      if(isset($button['policy']) && strlen($button['policy'])>0) {
+        $allow=checkUserPolicy($button['policy']);
+        if(!$allow) continue;
+      }
+      if(!isset($button['class'])) $button['class']="";
+
+      if(isset($button['label'])) $label=$button['label'];
+      else $label="";
+
+      if(isset($button['title'])) $title=$button['title'];
+      else $title="";
+
+      if(isset($button['icon']))  $icon=$button['icon'];
+      else $icon="";
+      
+      if(strlen($icon)>0 && $icon == strip_tags($icon)) {
+        $icon="<i class='{$icon}'></i> ";
+      }
+
+      if(!isset($button['type'])) $button['type']="button";
+
+      $html .= "<span class='{$button['class']} mouseAction' cmd='{$key}' title='{$title}'>{$icon}{$label}</span>";
+    }
+    return $html;
+  }
 }
 
 ?>

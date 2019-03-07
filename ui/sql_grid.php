@@ -5,6 +5,8 @@ $colsArr=explode(",",$_ENV['INFOVIEW']['cols']);
 
 $_ENV['INFOVIEW']['columns']=$colsArr;
 
+if(!isset($_ENV['INFOVIEW']['hidden'])) $_ENV['INFOVIEW']['hidden']=[];
+
 $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
 // printArray($_ENV['INFOVIEW']);
 ?>
@@ -12,9 +14,9 @@ $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
       data-dcode='<?=$dcode?>' data-dtuid='<?=$dtuid?>' data-page=0 data-limit=20 data-ui="grid">
     <div class='col-md-12 table-responsive infoview-table'>
         <?php
-          if(isset($_ENV['INFOVIEW']['buttons']) && is_array($_ENV['INFOVIEW']['buttons'])) {
+          if(isset($_ENV['INFOVIEW']['actions']) && is_array($_ENV['INFOVIEW']['actions'])) {
             echo "<div class='form-actions text-right'>";
-            echo getInfoViewActions($_ENV['INFOVIEW']['buttons']);
+            echo getInfoViewActions($_ENV['INFOVIEW']['actions']);
             echo "</div>";
           }
         ?>
@@ -24,6 +26,7 @@ $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
                     <?php
                     foreach($colsArr as $n=>$v) {
                           $xtras="";
+                          $clz="";
                       
                           $k=explode(".",$v);
                           $k=explode(" as ",end($k));
@@ -34,9 +37,11 @@ $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
                           } else {
                             
                           }
+                          
                           $nm=$k[0];
+                          if(in_array($nm, $_ENV['INFOVIEW']['hidden'])) $clz.="hidden d-none noshow";
                         ?>
-                        <th name='<?=$nm?>' <?=$xtras?> ><?=toTitle($k1)?></th>
+                        <th name='<?=$nm?>' class='<?=$clz?>' <?=$xtras?> ><?=toTitle($k1)?></th>
                         <?php
                     }
                     ?>
@@ -61,5 +66,12 @@ $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
               ?>
           </tfoot>
         </table>
+        <?php
+          if(isset($_ENV['INFOVIEW']['footactions']) && is_array($_ENV['INFOVIEW']['footactions'])) {
+            echo "<div class='form-actions text-right'>";
+            echo getInfoViewActions($_ENV['INFOVIEW']['footactions']);
+            echo "</div>";
+          }
+        ?>
     </div>
 </div>

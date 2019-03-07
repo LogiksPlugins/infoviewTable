@@ -3,6 +3,8 @@ if(!defined('ROOT')) exit('No direct script access allowed');
 
 $uniLinks=[];
 
+include __DIR__."/api.php";
+
 switch($_REQUEST['action']){
   case "fetchGrid":
     if(isset($_GET['dtuid']) && isset($_GET['refid'])) {
@@ -71,6 +73,8 @@ switch($_REQUEST['action']){
         
         if($data && count($data)>0) {
           //printServiceMsg($data);
+          if(!isset($src['hidden'])) $src['hidden'] = [];
+
           $rowKey=array_keys($data[0])[0];
           
           foreach($data as $nx=>$row) {
@@ -79,6 +83,9 @@ switch($_REQUEST['action']){
               if($a==$rowKey) continue;
               
               $a=$colMap[$a];
+
+              $clz = "";
+              if(in_array($a, $src['hidden'])) $clz.="hidden d-none noshow";
               
               if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$b)) {
                   $t=_pDate($b);
@@ -91,15 +98,15 @@ switch($_REQUEST['action']){
                 if(is_array($uniLinks[$a])) {
                   //"name"=>["type"=>"profile.customers","col"=>"id"]
                   if(isset($uniLinks[$a]['type']) && isset($uniLinks[$a]['col']) && isset($row[$uniLinks[$a]['col']])) {
-                    echo "<td class='{$a}'><a href='#' class='unilink' data-type='{$uniLinks[$a]['type']}' data-hashid='{$row[$uniLinks[$a]['col']]}'>{$t}</a></td>";
+                    echo "<td class='{$a} $clz'><a href='#' class='unilink' data-type='{$uniLinks[$a]['type']}' data-hashid='{$row[$uniLinks[$a]['col']]}'>{$t}</a></td>";
                   } else {
-                    echo "<td class='{$a}' data-name='{$a}' data-value='{$b}' data-error='unilink-error'>{$t}</td>";
+                    echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}' data-error='unilink-error'>{$t}</td>";
                   }
                 } else {
-                  echo "<td class='{$a}'><a href='#' class='unilink' data-type='{$uniLinks[$a]}' data-hashid='{$b}'>{$t}</a></td>";
+                  echo "<td class='{$a} $clz'><a href='#' class='unilink' data-type='{$uniLinks[$a]}' data-hashid='{$b}'>{$t}</a></td>";
                 }
               } else {
-                echo "<td class='{$a}' data-name='{$a}' data-value='{$b}'>{$t}</td>";
+                echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}'>{$t}</td>";
               }
             }
             
@@ -148,6 +155,8 @@ switch($_REQUEST['action']){
         $data=$sql->_GET();
 //         var_dump(_db()->get_error());
         if($data) {
+          if(!isset($src['hidden'])) $src['hidden'] = [];
+
           foreach($data[0] as $a=>$b) {
             if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$b)) {
                 $b=_pDate($b);
@@ -155,18 +164,22 @@ switch($_REQUEST['action']){
                 $b=_ling($b);
             }
             $t=toTitle(_ling($a));
+
+            $clz = "";
+            if(in_array($a, $src['hidden'])) $clz .= "hidden d-none noshow";
+            
             if(array_key_exists($a,$uniLinks)) {
               if(is_array($uniLinks[$a])) {
                 if(isset($uniLinks[$a]['type']) && isset($uniLinks[$a]['col']) && isset($data[0][$uniLinks[$a]['col']])) {
-                  echo "<tr><th width=30%>{$t}</th><td><a href='#' class='unilink' data-type='{$uniLinks[$a]}' data-hashid='{$data[0][$uniLinks[$a]['col']]}'>{$b}</a></td></tr>";
+                  echo "<tr class='{$clz}'><th width=30%>{$t}</th><td><a href='#' class='unilink' data-type='{$uniLinks[$a]}' data-hashid='{$data[0][$uniLinks[$a]['col']]}'>{$b}</a></td></tr>";
                 } else {
-                  echo "<tr><th width=30%>{$t}</th><td>{$b}</td></tr>";
+                  echo "<tr class='{$clz}'><th width=30%>{$t}</th><td>{$b}</td></tr>";
                 }
               } else {
-                echo "<tr><th width=30%>{$t}</th><td><a href='#' class='unilink' data-type='{$uniLinks[$a]}' data-hashid='{$b}'>{$b}</a></td></tr>";
+                echo "<tr class='{$clz}'><th width=30%>{$t}</th><td><a href='#' class='unilink' data-type='{$uniLinks[$a]}' data-hashid='{$b}'>{$b}</a></td></tr>";
               }
             } else {
-              echo "<tr><th width=30%>{$t}</th><td>{$b}</td></tr>";
+              echo "<tr class='{$clz}'><th width=30%>{$t}</th><td>{$b}</td></tr>";
             }
           }
         } else {
@@ -402,7 +415,7 @@ function processDateTime($datetime) {
 
 function executeInfoviewTableHook($state,$formConfig) {
 		if(!isset($formConfig['hooks']) || !is_array($formConfig['hooks'])) return false;
-		$state=strtolower($state);
+		$state=strtolower("infoview-".$state);
 
 		if(isset($formConfig['hooks'][$state]) && is_array($formConfig['hooks'][$state])) {
 			$postCFG=$formConfig['hooks'][$state];

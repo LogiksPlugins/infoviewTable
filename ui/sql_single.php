@@ -7,9 +7,9 @@ $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
       data-dcode='<?=$dcode?>' data-dtuid='<?=$dtuid?>' data-page=-1 data-limit=20 data-ui="single">
     <div class='col-md-12 table-responsive'>
         <?php
-          if(isset($_ENV['INFOVIEW']['buttons']) && is_array($_ENV['INFOVIEW']['buttons'])) {
+          if(isset($_ENV['INFOVIEW']['actions']) && is_array($_ENV['INFOVIEW']['actions'])) {
             echo "<div class='form-actions text-right'>";
-            echo getInfoViewActions($_ENV['INFOVIEW']['buttons']);
+            echo getInfoViewActions($_ENV['INFOVIEW']['actions']);
             echo "</div>";
           }
         ?>
@@ -18,5 +18,12 @@ $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
               
             </tbody>
         </table>
+        <?php
+          if(isset($_ENV['INFOVIEW']['footactions']) && is_array($_ENV['INFOVIEW']['footactions'])) {
+            echo "<div class='form-actions text-right'>";
+            echo getInfoViewActions($_ENV['INFOVIEW']['footactions']);
+            echo "</div>";
+          }
+        ?>
     </div>
 </div>
