@@ -130,6 +130,8 @@ if(!function_exists("generateInfoForm")) {
 
       if(!isset($button['type'])) $button['type']="button";
 
+      $key = _replace($key);
+
       $html .= "<span class='{$button['class']} mouseAction' cmd='{$key}' title='{$title}'>{$icon}{$label}</span>";
     }
     return $html;
