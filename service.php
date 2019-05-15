@@ -98,6 +98,9 @@ switch($_REQUEST['action']){
                 if(is_array($uniLinks[$a])) {
                   //"name"=>["type"=>"profile.customers","col"=>"id"]
                   if(isset($uniLinks[$a]['type']) && isset($uniLinks[$a]['col']) && isset($row[$uniLinks[$a]['col']])) {
+                    if(isset($uniLinks[$a]['viewtext'])) {
+                      $t = $uniLinks[$a]['viewtext'];
+                    }
                     echo "<td class='{$a} $clz'><a href='#' class='unilink' data-type='{$uniLinks[$a]['type']}' data-hashid='{$row[$uniLinks[$a]['col']]}'>{$t}</a></td>";
                   } else {
                     echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}' data-error='unilink-error'>{$t}</td>";
