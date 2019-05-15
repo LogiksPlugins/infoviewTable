@@ -81,11 +81,12 @@ switch($_REQUEST['action']){
             echo "<tr data-refid='".md5($row[$rowKey])."'>";
             foreach($row as $a=>$b) {
               if($a==$rowKey) continue;
-              
+        
+        $a1 = $a;
               $a=$colMap[$a];
 
               $clz = "";
-              if(in_array($a, $src['hidden'])) $clz.="hidden d-none noshow";
+              if(in_array($a, $src['hidden']) || in_array($a1, $src['hidden'])) $clz.="hidden d-none noshow";
               
               if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$b)) {
                   $t=_pDate($b);
@@ -255,9 +256,9 @@ switch($_REQUEST['action']){
           
           $a=_db()->_insertQ1($formConfig['source']['table'],$fData)->_RUN();
           if($a) {
-						if(!isset($_REQUEST['refid'])) {
-							$_REQUEST['refid']=md5(_db()->get_insertID());
-						}
+            if(!isset($_REQUEST['refid'])) {
+              $_REQUEST['refid']=md5(_db()->get_insertID());
+            }
             executeInfoviewTableHook("postsubmit",$src);
             printServiceMsg("Record Created Successully");
           } else {
@@ -420,35 +421,35 @@ function processDateTime($datetime) {
 }
 
 function executeInfoviewTableHook($state,$formConfig) {
-		if(!isset($formConfig['hooks']) || !is_array($formConfig['hooks'])) return false;
-		$state=strtolower("infoview-".$state);
+    if(!isset($formConfig['hooks']) || !is_array($formConfig['hooks'])) return false;
+    $state=strtolower("infoview-".$state);
 
-		if(isset($formConfig['hooks'][$state]) && is_array($formConfig['hooks'][$state])) {
-			$postCFG=$formConfig['hooks'][$state];
+    if(isset($formConfig['hooks'][$state]) && is_array($formConfig['hooks'][$state])) {
+      $postCFG=$formConfig['hooks'][$state];
 
-			if(isset($postCFG['modules'])) {
-				loadModules($postCFG['modules']);
-			}
-			if(isset($postCFG['api'])) {
-				if(!is_array($postCFG['api'])) $postCFG['api']=explode(",",$postCFG['api']);
-				foreach ($postCFG['api'] as $apiModule) {
-					loadModuleLib($apiModule,'api');
-				}
-			}
-			if(isset($postCFG['helpers'])) {
-				loadHelpers($postCFG['helpers']);
-			}
-			if(isset($postCFG['method'])) {
-				if(!is_array($postCFG['method'])) $postCFG['method']=explode(",",$postCFG['method']);
-				foreach($postCFG['method'] as $m) call_user_func($m,$formConfig);
-			}
-			if(isset($postCFG['file'])) {
-				if(!is_array($postCFG['file'])) $postCFG['file']=explode(",",$postCFG['file']);
-				foreach($postCFG['file'] as $m) {
-					if(file_exists($m)) include $m;
-					elseif(file_exists(APPROOT.$m)) include APPROOT.$m;
-				}
-			}
-		}
-	}
+      if(isset($postCFG['modules'])) {
+        loadModules($postCFG['modules']);
+      }
+      if(isset($postCFG['api'])) {
+        if(!is_array($postCFG['api'])) $postCFG['api']=explode(",",$postCFG['api']);
+        foreach ($postCFG['api'] as $apiModule) {
+          loadModuleLib($apiModule,'api');
+        }
+      }
+      if(isset($postCFG['helpers'])) {
+        loadHelpers($postCFG['helpers']);
+      }
+      if(isset($postCFG['method'])) {
+        if(!is_array($postCFG['method'])) $postCFG['method']=explode(",",$postCFG['method']);
+        foreach($postCFG['method'] as $m) call_user_func($m,$formConfig);
+      }
+      if(isset($postCFG['file'])) {
+        if(!is_array($postCFG['file'])) $postCFG['file']=explode(",",$postCFG['file']);
+        foreach($postCFG['file'] as $m) {
+          if(file_exists($m)) include $m;
+          elseif(file_exists(APPROOT.$m)) include APPROOT.$m;
+        }
+      }
+    }
+  }
 ?>

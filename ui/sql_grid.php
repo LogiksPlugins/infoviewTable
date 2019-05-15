@@ -39,7 +39,7 @@ $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
                           }
                           
                           $nm=$k[0];
-                          if(in_array($nm, $_ENV['INFOVIEW']['hidden'])) $clz.="hidden d-none noshow";
+                          if(in_array($nm, $_ENV['INFOVIEW']['hidden']) || in_array(end($k), $_ENV['INFOVIEW']['hidden'])) $clz.="hidden d-none noshow";
                         ?>
                         <th name='<?=$nm?>' class='<?=$clz?>' <?=$xtras?> ><?=toTitle($k1)?></th>
                         <?php
