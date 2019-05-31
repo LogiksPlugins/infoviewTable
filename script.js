@@ -49,6 +49,10 @@ function loadInfoTable(src) {
       if($(b).val()!=null && $(b).val().length>0) return true; else return false;
     }).serialize();
 
+  if($(".col-sidebar").length>0 && $(".col-sidebar li.active").length>0) {
+    qData +="&filter["+$(".col-sidebar li.active").data("colkey")+"]="+$(".col-sidebar li.active").data("refid");
+  }
+
   processAJAXPostQuery(lx, qData, function(htmlData) {
     $(src).find("table.table tbody").html(htmlData);
     if($(src).find("table.table tbody tr[data-refid]").length<=0) {
@@ -252,5 +256,10 @@ function sortInfoviewByColumn(src) {
     $(src).append('<i class="fa fa-caret-up pull-right"></i>');
     $(srcPane).data("sort",$(src).attr("name")+" DESC");
   }
+  loadInfoTableInline(src);
+}
+function filterInfoviewDataOnSidebar(src) {
+  $(src).closest(".col-sidebar").find(".active").removeClass("active");
+  $(src).addClass("active");
   loadInfoTableInline(src);
 }

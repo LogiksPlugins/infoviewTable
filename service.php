@@ -30,9 +30,18 @@ switch($_REQUEST['action']){
           $sql->_whereRAW(_replace($src['where']));
         }
 
-        if(isset($_POST) && count($_POST)>0) {
-          foreach($_POST as $a=>$b) {
-            $sql->_where(["{$tbl1}.{$a}"=>[clean($b),"LIKE"]]);
+        if(isset($_POST['filter']) && count($_POST['filter'])>0) {
+          foreach($_POST['filter'] as $a=>$b) {
+            if(is_string($b) && strlen($b)>0) {
+              $sql->_where(["{$tbl1}.{$a}"=>$b]);
+            }
+          }
+        }
+        if(isset($_POST['search']) && count($_POST['search'])>0) {
+          foreach($_POST['search'] as $a=>$b) {
+            if(is_string($b) && strlen($b)>0) {
+              $sql->_where(["{$tbl1}.{$a}"=>[clean($b),"LIKE"]]);
+            }
           }
         }
 

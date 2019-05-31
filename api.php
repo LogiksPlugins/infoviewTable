@@ -118,7 +118,7 @@ if(!function_exists("generateInfoForm")) {
       }
       $noOption=_ling($fieldConfig['no-option']);
 
-      $html = "<select class='form-control field-dropdown' name='{$fkey}'>";
+      $html = "<select class='form-control field-dropdown' name='filter[{$fkey}]'>";
       
       if(is_array($fieldConfig['options'])) {
         if(!array_key_exists("", $fieldConfig['options']) || (isset($fieldConfig['options']['']) && $fieldConfig['options']['']===true)) {
@@ -143,7 +143,7 @@ if(!function_exists("generateInfoForm")) {
       break;
 
       default:
-        return "<input type='text' class='form-control' name='{$fkey}' />";
+        return "<input type='text' class='form-control' name='search[{$fkey}]' />";
     }
     return "";
   }
@@ -177,6 +177,76 @@ if(!function_exists("generateInfoForm")) {
       $html .= "<span class='{$button['class']} mouseAction' cmd='{$key}' title='{$title}'>{$icon}{$label}</span>";
     }
     return $html;
+  }
+
+  function getInfoViewSidebar($infoConfig) {
+    if(!isset($infoConfig['table']) || !isset($infoConfig['cols']) || !isset($infoConfig['colkey'])) return "";
+
+    if(!isset($infoConfig['type'])) $infoConfig['type'] = "list";
+
+    $html = [];
+    
+    $tbl1=current(explode(",",$infoConfig['table']));
+    $sql=_db()->_selectQ($infoConfig['table'],$infoConfig['cols'],["{$tbl1}.blocked"=>'false']);
+    if(is_array($infoConfig['where'])) {
+      foreach($infoConfig['where'] as $a=>$b) {
+        if($b=="RAW") {
+          unset($infoConfig['where'][$a]);
+          $infoConfig['where'][_replace($a)]=$b;
+        } else {
+          $infoConfig['where'][$a]=_replace($b);
+        }
+      }
+      $sql->_where($infoConfig['where']);
+    } else {
+      $sql->_whereRAW(_replace($infoConfig['where']));
+    }
+
+    if(isset($_POST) && count($_POST)>0) {
+      foreach($_POST as $a=>$b) {
+        $sql->_where(["{$tbl1}.{$a}"=>[clean($b),"LIKE"]]);
+      }
+    }
+
+    if(isset($infoConfig['orderby']) && strlen($infoConfig['orderby'])>0) {
+      $sql->_orderBy($infoConfig['orderby']);
+    } elseif(isset($infoConfig['orderBy']) && strlen($infoConfig['orderBy'])>0) {
+      $sql->_orderBy($infoConfig['orderBy']);
+    }
+
+    if(isset($infoConfig['groupby']) && strlen($infoConfig['groupby'])>0) {
+      $sql->_groupBy($infoConfig['groupby']);
+    } elseif(isset($infoConfig['groupBy']) && strlen($infoConfig['groupBy'])>0) {
+      $sql->_groupBy($infoConfig['groupBy']);
+    }
+
+    $sql->_limit(100);
+    $data=$sql->_GET();
+    
+    if(!$data) return "";
+
+    switch ($infoConfig['type']) {
+      case 'list':
+        $html[] = "<ul class='list-group' data-colkey='{$infoConfig['colkey']}'>";
+        foreach ($data as $row) {
+          if(isset($row['title']) && isset($row['value'])) {
+            $html[] = "<li class='list-group-item' data-refid='{$row['value']}' data-colkey='{$infoConfig['colkey']}' cmd='filterInfoviewDataOnSidebar'>{$row['title']}</li>";
+          }
+        }
+        $html[] = "</ul>";
+        break;
+      case 'accordion':
+        
+        // break;
+      case 'tree':
+        
+        // break;
+      default:
+        $html[] = "<p>Not supported yet</p>";
+        break;
+    }
+
+    return implode("", $html);
   }
 }
 

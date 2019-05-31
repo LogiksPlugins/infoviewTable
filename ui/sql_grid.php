@@ -9,6 +9,7 @@ if(!isset($_ENV['INFOVIEW']['hidden'])) $_ENV['INFOVIEW']['hidden']=[];
 
 $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
 // printArray($_ENV['INFOVIEW']);
+
 ?>
 <style>
   .infoTableView thead th {
@@ -27,10 +28,34 @@ $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
     width: 80px;
     margin: auto;
   }
+  .infoTableView .col-sidebar {
+    height: 100%;
+    overflow: auto;
+    padding: 0px;
+    border-right: 1px solid #999;
+  }
+  .infoTableView .col-sidebar .list-group-item {
+    border: 0px;
+    border-bottom: 1px solid #CACACA;
+    max-height: 33px;
+    overflow: hidden;
+    margin-bottom: 2px;
+    cursor: pointer;
+  }
 </style>
 <div id='infoviewTable_<?=$dtuid?>' class="row infoTableView infoTableGrid infoOnOpen" 
       data-dcode='<?=$dcode?>' data-dtuid='<?=$dtuid?>' data-page=0 data-limit=20 data-ui="grid">
-    <div class='col-md-12 table-responsive infoview-table'>
+    <?php
+      if(isset($_ENV['INFOVIEW']['sidebar']) && $_ENV['INFOVIEW']['sidebar']) {
+        echo "<div class='col-md-2 col-sidebar'>";
+        echo getInfoViewSidebar($_ENV['INFOVIEW']['sidebar']);
+        echo "</div>";
+        echo "<div class='col-md-10'>";
+      } else {
+        echo "<div class='col-md-12'>";
+      }
+    ?>
+      <div class="table-responsive infoview-table">
         <?php
           if(isset($_ENV['INFOVIEW']['actions']) && is_array($_ENV['INFOVIEW']['actions'])) {
             echo "<div class='form-actions text-right'>";
@@ -178,5 +203,6 @@ $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
             echo "</div>";
           }
         ?>
+    </div>
     </div>
 </div>
