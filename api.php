@@ -106,6 +106,48 @@ if(!function_exists("generateInfoForm")) {
     return "<td class='infotable-col infotable-col-{$fkey} {$fieldConfig['type']}' width='{$fieldConfig['width']}' colspan='{$fieldConfig['span']}' title='{$fieldConfig['tooltip']}'>".$html."</td>";
   }
 
+  function getInfoFilterField($fkey, $fieldConfig) {
+    if(!isset($fieldConfig['type'])) $fieldConfig['type']="text";
+    switch($fieldConfig['type']) {
+      case 'dataMethod': case 'dataSelector': case 'dataSelectorFromUniques': case 'dataSelectorFromTable':
+      case 'dropdown': case 'select':
+      if(!isset($fieldConfig['options'])) $fieldConfig['options']=[];
+
+      if(!isset($fieldConfig['no-option'])) {
+        $fieldConfig['no-option']="Select ".toTitle($fkey);
+      }
+      $noOption=_ling($fieldConfig['no-option']);
+
+      $html = "<select class='form-control field-dropdown' name='{$fkey}'>";
+      
+      if(is_array($fieldConfig['options'])) {
+        if(!array_key_exists("", $fieldConfig['options']) || (isset($fieldConfig['options']['']) && $fieldConfig['options']['']===true)) {
+          $html.="<option value=''>{$noOption}</option>";
+        }
+        foreach ($fieldConfig['options'] as $key => $value) {
+          if($key==null || strlen($key)<=0) continue;
+          $html.="<option value='{$key}'>{$value}</option>";
+        }
+      }
+      if(isset($fieldConfig['dbkey'])) $dkey1=$fieldConfig['dbkey'];
+      else $dkey1="app";
+      
+      if(isset($fieldConfig['search']) && $fieldConfig['search']==true) {
+        
+      } else {
+        $html.=generateSelectOptions($fieldConfig,"",$dkey1);
+      }
+
+      $html .= "</select>";
+      return $html;
+      break;
+
+      default:
+        return "<input type='text' class='form-control' name='{$fkey}' />";
+    }
+    return "";
+  }
+
   function getInfoViewTableActions($actions=[]) {
     $html="";
     foreach ($actions as $key => $button) {

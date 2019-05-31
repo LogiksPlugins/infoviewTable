@@ -29,9 +29,29 @@ switch($_REQUEST['action']){
         } else {
           $sql->_whereRAW(_replace($src['where']));
         }
+
+        if(isset($_POST) && count($_POST)>0) {
+          foreach($_POST as $a=>$b) {
+            $sql->_where(["{$tbl1}.{$a}"=>[clean($b),"LIKE"]]);
+          }
+        }
+
         if(isset($src['orderby']) && strlen($src['orderby'])>0) {
           $sql->_orderBy($src['orderby']);
+        } elseif(isset($src['orderBy']) && strlen($src['orderBy'])>0) {
+          $sql->_orderBy($src['orderBy']);
         }
+
+        if(isset($src['groupby']) && strlen($src['groupby'])>0) {
+          $sql->_groupBy($src['groupby']);
+        } elseif(isset($src['groupBy']) && strlen($src['groupBy'])>0) {
+          $sql->_groupBy($src['groupBy']);
+        }
+
+        if(isset($_GET['sort'])) {
+          $sql->_orderBy($_GET['sort']);
+        }
+
         if(isset($_GET['page'])) {
           $pg=$_GET['page'];
         } else {
@@ -48,7 +68,7 @@ switch($_REQUEST['action']){
         $allowDelete=checkUserRoles($src['security']['module'],$src['security']['activity'],"DELETE");
 
         if(isset($src['DEBUG']) && $src['DEBUG']) {
-          echo "<tr><td colspan=100>";
+          echo "<tr><td colspan=1000>";
           echo $sql->_SQL();
           echo "</td></tr>";
         }
@@ -82,7 +102,7 @@ switch($_REQUEST['action']){
             foreach($row as $a=>$b) {
               if($a==$rowKey) continue;
         
-        $a1 = $a;
+              $a1 = $a;
               $a=$colMap[$a];
 
               $clz = "";
@@ -102,12 +122,12 @@ switch($_REQUEST['action']){
                     if(isset($uniLinks[$a]['viewtext'])) {
                       $t = $uniLinks[$a]['viewtext'];
                     }
-                    echo "<td class='{$a} $clz'><a href='#' class='unilink' data-type='{$uniLinks[$a]['type']}' data-hashid='{$row[$uniLinks[$a]['col']]}'>{$t}</a></td>";
+                    echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}'><a href='#' class='unilink' data-type='{$uniLinks[$a]['type']}' data-hashid='{$row[$uniLinks[$a]['col']]}'>{$t}</a></td>";
                   } else {
                     echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}' data-error='unilink-error'>{$t}</td>";
                   }
                 } else {
-                  echo "<td class='{$a} $clz'><a href='#' class='unilink' data-type='{$uniLinks[$a]}' data-hashid='{$b}'>{$t}</a></td>";
+                  echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}'><a href='#' class='unilink' data-type='{$uniLinks[$a]}' data-hashid='{$b}'>{$t}</a></td>";
                 }
               } else {
                 echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}'>{$t}</td>";
@@ -118,11 +138,11 @@ switch($_REQUEST['action']){
             if(isset($src['buttons']) && is_array($src['buttons'])) {
               echo getInfoViewTableActions($src['buttons']);
             }
-            if($allowEdit) {
-              echo "<i class='fa fa-pencil mouseAction pull-right' onclick='editInfoRecord(this)'></i>";
-            }
             if($allowDelete) {
               echo "<i class='fa fa-trash mouseAction pull-right' onclick='deleteInfoRecord(this)'></i>";
+            }
+            if($allowEdit) {
+              echo "<i class='fa fa-pencil mouseAction pull-right' onclick='editInfoRecord(this)'></i>";
             }
             echo "</td>";
             echo "</tr>";
