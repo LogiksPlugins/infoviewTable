@@ -131,7 +131,10 @@ switch($_REQUEST['action']){
                     if(isset($uniLinks[$a]['viewtext'])) {
                       $t = $uniLinks[$a]['viewtext'];
                     }
-                    echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}'><a href='#' class='unilink' data-type='{$uniLinks[$a]['type']}' data-hashid='{$row[$uniLinks[$a]['col']]}'>{$t}</a></td>";
+                    if($row[$uniLinks[$a]['col']]!=null && strlen($row[$uniLinks[$a]['col']])>0)
+                      echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}'><a href='#' class='unilink' data-type='{$uniLinks[$a]['type']}' data-hashid='{$row[$uniLinks[$a]['col']]}'>{$t}</a></td>";
+                    else
+                      echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}'></td>";
                   } else {
                     echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}' data-error='unilink-error'>{$t}</td>";
                   }
