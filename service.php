@@ -145,16 +145,20 @@ switch($_REQUEST['action']){
                 echo "<td class='{$a} $clz' data-name='{$a}' data-value='{$b}'>{$t}</td>";
               }
             }
+
+            if(!isset($src['default_buttons'])) $src['default_buttons'] = true;
             
             echo "<td class='col-actions actions'>";
             if(isset($src['buttons']) && is_array($src['buttons'])) {
               echo getInfoViewTableActions($src['buttons']);
             }
-            if($allowDelete) {
-              echo "<i class='fa fa-trash mouseAction pull-right' onclick='deleteInfoRecord(this)'></i>";
-            }
-            if($allowEdit) {
-              echo "<i class='fa fa-pencil mouseAction pull-right' onclick='editInfoRecord(this)'></i>";
+            if($src['default_buttons']) {
+              if($allowDelete) {
+                echo "<i class='fa fa-trash mouseAction pull-right' onclick='deleteInfoRecord(this)'></i>";
+              }
+              if($allowEdit) {
+                echo "<i class='fa fa-pencil mouseAction pull-right' onclick='editInfoRecord(this)'></i>";
+              }
             }
             echo "</td>";
             echo "</tr>";
