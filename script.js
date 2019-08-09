@@ -80,8 +80,12 @@ function initInfoViewTableActions(refDiv) {
       if(parentObject.length<=0) {
         parentObject=$(src).closest(".infoviewContainer");
       }
+      parentRow = $(src).closest("tr");
+
       hash=parentObject.data('dcode');
       gkey=parentObject.data('dtuid');
+      refid=parentRow.data('refid');
+
       title=$(src).text();
       if(title==null || title.length<=0) {
         title=$(src).attr("title");
@@ -94,7 +98,7 @@ function initInfoViewTableActions(refDiv) {
             case "forms":case "reports":case "infoview":
               cmdX=cmdOriginalX.split("@");
               if(cmdX[1]!=null) {
-                cmdX[1]=cmdX[1].replace("{hashid}",hash).replace("{gkey}",gkey);
+                cmdX[1]=cmdX[1].replace("{hashid}",hash).replace("{gkey}",gkey).replace("{rowhash}",refid);
 
                 lgksOverlayFrame(_link("modules/"+cmd+"/"+cmdX[1]),title,function() {
                       hideLoader();
@@ -104,14 +108,14 @@ function initInfoViewTableActions(refDiv) {
             case "page":
               cmdX=cmdOriginalX.split("@");
               if(cmdX[1]!=null) {
-                cmdX[1]=cmdX[1].replace("{hashid}",hash).replace("{gkey}",gkey);
+                cmdX[1]=cmdX[1].replace("{hashid}",hash).replace("{gkey}",gkey).replace("{rowhash}",refid);
                 window.location=_link("modules/"+cmdX[1]);
               }
               break;
             case "module":case "popup":
               cmdX=cmdOriginalX.split("@");
               if(cmdX[1]!=null) {
-                cmdX[1]=cmdX[1].replace("{hashid}",hash).replace("{gkey}",gkey);
+                cmdX[1]=cmdX[1].replace("{hashid}",hash).replace("{gkey}",gkey).replace("{rowhash}",refid);
 
                 if(cmd=="module" || cmd=="modules") {
                   top.openLinkFrame(title,_link("modules/"+cmdX[1]),true);
