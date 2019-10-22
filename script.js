@@ -63,6 +63,14 @@ function loadInfoTable(src) {
       if(pg<0) pg = 0;
 
       $(src).data("page",pg);
+      
+      if(cmd=="fetchGrid") {
+         $(src).find("table.table tfoot.info-pagination").hide();
+      }
+    } else {
+        if(cmd=="fetchGrid") {
+            $(src).find("table.table tfoot.info-pagination").show();
+        }
     }
     initInfoViewTableActions($(src).find("table.table tbody"));
   });
