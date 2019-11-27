@@ -69,7 +69,11 @@ function loadInfoTable(src) {
       }
     } else {
         if(cmd=="fetchGrid") {
-            $(src).find("table.table tfoot.info-pagination").show();
+            if($(src).find("table.table tbody tr[data-refid]").length>=($(src).data("limit")-1)) {
+                $(src).find("table.table tfoot.info-pagination").show();
+            } else{
+                $(src).find("table.table tfoot.info-pagination").hide();
+            }
         }
     }
     initInfoViewTableActions($(src).find("table.table tbody"));
