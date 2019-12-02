@@ -411,16 +411,27 @@ switch($_REQUEST['action']){
           $_REQUEST['DATE']=date("Y-m-d");
           $_REQUEST['DATETIME']=date("Y-m-d H:i:s");
           
-          $fData=[
+          $where=[
+            "md5(id)"=>$refid
+          ];
+
+          if(!isset($src['delete'])) $src['delete'] = "soft";
+          
+          switch(strtolower($src['delete'])) {
+            case "soft":
+                $fData=[
                   "blocked"=>"true",
                   "edited_by"=>$_SESSION['SESS_USER_ID'],
                   "edited_on"=>date("Y-m-d H:i:s"),
                 ];
-          $where=[
-            "md5(id)"=>$refid
-          ];
+                $a=_db()->_updateQ($formConfig['source']['table'],$fData,$where)->_RUN();
+                break;
+            case "hard":
+                $a=_db()->_deleteQ($formConfig['source']['table'],$where)->_RUN();
+                break;
+          } 
           
-          $a=_db()->_updateQ($formConfig['source']['table'],$fData,$where)->_RUN();
+          // $a=_db()->_updateQ($formConfig['source']['table'],$fData,$where)->_RUN();
           if($a) {
             executeInfoviewTableHook("postsubmit",$src);
             printServiceMsg("Record Deleted Successully");
