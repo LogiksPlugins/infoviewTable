@@ -13,9 +13,10 @@ switch($_REQUEST['action']){
         if(isset($src['unilinks'])) {
           $uniLinks=$src['unilinks'];
         }
+        if(!isset($src['dbkey'])) $src['dbkey'] = "app";
 
         $tbl1=current(explode(",",$src['table']));
-        $sql=_db()->_selectQ($src['table'],$src['cols'],["{$tbl1}.blocked"=>'false']);
+        $sql=_db($src['dbkey'])->_selectQ($src['table'],$src['cols'],["{$tbl1}.blocked"=>'false']);
         if(is_array($src['where'])) {
           foreach($src['where'] as $a=>$b) {
             if($b=="RAW") {
@@ -179,7 +180,9 @@ switch($_REQUEST['action']){
           $uniLinks=$src['unilinks'];
         }
 
-        $sql=_db()->_selectQ($src['table'],$src['cols']);
+        if(!isset($src['dbkey'])) $src['dbkey'] = "app";
+
+        $sql=_db($src['dbkey'])->_selectQ($src['table'],$src['cols']);
         if(is_array($src['where'])) {
           $sql->_where($src['where']);
         } else {
@@ -289,8 +292,10 @@ switch($_REQUEST['action']){
               }
             }
           }
+
+          if(!isset($src['dbkey'])) $src['dbkey'] = "app";
           
-          $a=_db()->_insertQ1($formConfig['source']['table'],$fData)->_RUN();
+          $a=_db($src['dbkey'])->_insertQ1($formConfig['source']['table'],$fData)->_RUN();
           if($a) {
             if(!isset($_REQUEST['refid'])) {
               $_REQUEST['refid']=md5(_db()->get_insertID());
