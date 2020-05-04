@@ -43,9 +43,10 @@ if(!function_exists("generateInfoForm")) {
         "where"=> ["md5(id)"]
       ];
       $_ENV['INFOVIEW']['form']['forcefill']=[
+        "guid"=> "#SESS_GUID#",
         "groupuid"=> "#SESS_GROUP_NAME#",
-        "access_level"=> "#SESS_ACCESS_LEVEL#",
-        "privilegeid"=> "#SESS_PRIVILEGE_ID#",
+        // "access_level"=> "#SESS_ACCESS_LEVEL#",
+        // "privilegeid"=> "#SESS_PRIVILEGE_ID#",
       ];
       
       if(isset($_ENV['INFOVIEW']['colkey'])) {
