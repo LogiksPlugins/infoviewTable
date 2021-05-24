@@ -2,14 +2,23 @@ $(function() {
   initInfoviewTableUI();
 });
 function initInfoviewTableUI() {
-  $(".infoviewContainerTabs").find(".infoTableView").each(function() {
-    src=$(this).closest(".tab-pane").attr("id");
-    $(".infoviewContainerTabs").find(".nav.nav-tabs").find("a[href='#"+src+"']").attr("data-onshowncallback","loadInfoTableCallback");
-  });
+  if($(".infoviewContainerTabs").length>0) {
+    $(".infoviewContainerTabs").find(".infoTableView").each(function() {
+      src=$(this).closest(".tab-pane").attr("id");
+      $(".infoviewContainerTabs").find(".nav.nav-tabs").find("a[href='#"+src+"']").attr("data-onshowncallback","loadInfoTableCallback");
+    });
+  } else if($(".infoviewContainerAccordion").length>0) {
+    $(".infoviewContainerAccordion").find(".infoTableView").each(function() {
+        var src=$(this).closest(".panel-collapse").attr("id");
+
+        $(".infoviewContainerAccordion").find(".panel-heading").find("a[href='#"+src+"']").attr("data-onshowncallback","loadInfoTableCallback");
+    });
+  }
+  
 }
 
 function loadInfoTableCallback(srcTag) {
-  srcPane=$($(srcTag).attr("href"),".infoviewContainerTabs").find(".infoTableView");
+  srcPane=$($(srcTag).attr("href"),".infoviewContainer").find(".infoTableView");
   cmd=srcPane.data('cmd');
   if(typeof window[cmd]=='function') {
     window[cmd](srcPane);
