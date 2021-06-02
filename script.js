@@ -207,7 +207,7 @@ function editInfoRecord(src) {
   tr=$(src).closest("tr");
   tr.find('td[data-name]').each(function() {
     nm=$(this).data("name");
-    $("input[name='"+nm+"'],select[name='"+nm+"'],textarea[name='"+nm+"']").val($(this).text());
+    $("input[name='"+nm+"'],select[name='"+nm+"'],textarea[name='"+nm+"']").val($(this).html());
   });
   frm.find("input[name=refid]").detach();
   frm.append("<input type='hidden' name='refid' value='"+tr.data("refid")+"' />");
