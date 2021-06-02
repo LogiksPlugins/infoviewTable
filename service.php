@@ -123,7 +123,16 @@ switch($_REQUEST['action']){
               } else {
                   $t=_ling($b);
                 
-                  $t=str_replace("\\n","<br>\n",$t);
+                  //$t=str_replace("\\n","<br>\n",$t);
+              }
+              if(isset($fields[$a]) && isset($fields[$a]['type'])) {
+                switch ($fields[$a]['type']) {
+                  case 'richtextarea':
+                    $t = str_replace("\\n","",$t);
+                    $t = stripcslashes($t);
+                    break;
+                }
+                // printArray($fields[$a]);exit();
               }
               if(array_key_exists($a,$uniLinks)) {
                 if(is_array($uniLinks[$a])) {
