@@ -100,7 +100,12 @@ switch($_REQUEST['action']){
           }
           $colMap[$k]=$v;
         }
-        
+
+        $fields = [];
+        $formatters = [];
+        if(isset($src['formatters'])) $formatters = $src['formatters'];
+        if(isset($src['form']) && isset($src['form']['fields'])) $fields = $src['form']['fields'];
+
         if($data && count($data)>0) {
           //printServiceMsg($data);
           if(!isset($src['hidden'])) $src['hidden'] = [];
@@ -125,15 +130,53 @@ switch($_REQUEST['action']){
                 
                   //$t=str_replace("\\n","<br>\n",$t);
               }
-              if(isset($fields[$a]) && isset($fields[$a]['type'])) {
+              if(isset($formatters[$a])) {
+                switch ($formatters[$a]) {
+                  case 'richtextarea':
+                    $t = str_replace("\\n","",$t);
+                    $t = stripcslashes($t);
+                    break;
+                  case 'date':
+                    $tx = explode(" ",$t);
+                    $t = _pDate($tx[0]);
+                    break;
+                  case 'date-raw':
+                    $tx = explode(" ",$t);
+                    $t = $tx[0];
+                    break;
+                  case 'datetime':
+                    $t = _pDate($t);
+                    break;
+                  case 'time':
+                    $tx = explode(" ",$t);
+                    $t = end($tx);
+                    break;
+                }
+              } elseif(isset($fields[$a]) && isset($fields[$a]['type'])) {
                 switch ($fields[$a]['type']) {
                   case 'richtextarea':
                     $t = str_replace("\\n","",$t);
                     $t = stripcslashes($t);
                     break;
+                  case 'date':
+                    $tx = explode(" ",$t);
+                    $t = _pDate($tx[0]);
+                    break;
+                  case 'date-raw':
+                    $tx = explode(" ",$t);
+                    $t = $tx[0];
+                    break;
+                  case 'datetime':
+                    $t = _pDate($t);
+                    break;
+                  case 'time':
+                    $tx = explode(" ",$t);
+                    $t = end($tx);
+                    break;
                 }
                 // printArray($fields[$a]);exit();
               }
+              
               if(array_key_exists($a,$uniLinks)) {
                 if(is_array($uniLinks[$a])) {
                   //"name"=>["type"=>"profile.customers","col"=>"id"]
