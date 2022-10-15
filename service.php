@@ -333,20 +333,22 @@ switch($_REQUEST['action']){
                     "edited_on"=>date("Y-m-d H:i:s"),
                   ]);
           foreach($formConfig['fields'] as $a=>$b) {
-            if(isset($fData[$a]) && isset($b['type'])) {
+            $a1 = explode(".", $a);
+            $a1 = end($a1);
+            if(isset($fData[$a1]) && isset($b['type'])) {
               switch(strtolower($b['type'])) {
                 case "date":
-                  $fData[$a]=processDate($fData[$a]);
+                  $fData[$a1]=processDate($fData[$a1]);
                   break;
                 case "datetime":
-                  $fData[$a]=processDateTime($fData[$a]);
+                  $fData[$a1]=processDateTime($fData[$a1]);
                   break;
               }
             }
           }
 
           if(!isset($src['dbkey'])) $src['dbkey'] = "app";
-          
+
           $a=_db($src['dbkey'])->_insertQ1($formConfig['source']['table'],$fData)->_RUN();
           if($a) {
             if(!isset($_REQUEST['refid'])) {
