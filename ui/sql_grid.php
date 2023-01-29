@@ -165,7 +165,7 @@ $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
               ?>
               <tr>
                 <td colspan="10000">
-                  <div class="row">
+                  <div class="row1">
                     <div class="col-md-4 text-left">
                       <i class="fa fa-chevron-left" onclick="showInfoviewTablePrev(this)"></i>
                     </div>
