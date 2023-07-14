@@ -74,8 +74,23 @@ switch($_REQUEST['action']){
         }
         $sql->_limit($lt,$lt*$pg);
         
-        $allowEdit=checkUserRoles($src['security']['module'],$src['security']['activity'],"EDIT");
-        $allowDelete=checkUserRoles($src['security']['module'],$src['security']['activity'],"DELETE");
+
+        if(isset($src['policy_update']) && checkUserPolicy($src['policy_update'])) {
+          $allowEdit=true;
+        } elseif(isset($src['policy_create']) && checkUserPolicy($src['policy_create'])) {
+          $allowEdit=true;
+        } else {
+          $allowEdit=false;
+        }
+
+        if(isset($src['policy_delete']) && checkUserPolicy($src['policy_delete'])) {
+          $allowDelete=true;
+        } else {
+          $allowDelete=false;
+        }
+
+        //$allowEdit=checkUserRoles($src['security']['module'],$src['security']['activity'],"EDIT");
+        //$allowDelete=checkUserRoles($src['security']['module'],$src['security']['activity'],"DELETE");
 
         if(isset($src['DEBUG']) && $src['DEBUG']) {
           echo "<tr><td colspan=1000>";

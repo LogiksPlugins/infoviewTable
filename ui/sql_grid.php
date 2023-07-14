@@ -190,7 +190,11 @@ $_SESSION['INFOVIEWTABLE'][$dtuid]=$_ENV['INFOVIEW'];
         <table class="table table-condensed">
           <tfoot class='info-form'>
               <?php
-                if(checkUserRoles($_ENV['INFOVIEW']['security']['module'],$_ENV['INFOVIEW']['security']['activity'],"CREATE")) {
+                if(isset($_ENV['INFOVIEW']['policy_create'])) {
+                  if(checkUserPolicy($_ENV['INFOVIEW']['policy_create'])) {
+                    echo generateInfoTableForm($_ENV['INFOVIEW'],$dtuid);
+                  }
+                } elseif(getConfig("INFOVIEW_GRID_DEFAULT_CREATE_ALLOW")=="true") {
                   echo generateInfoTableForm($_ENV['INFOVIEW'],$dtuid);
                 }
               ?>
