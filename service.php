@@ -309,10 +309,16 @@ switch($_REQUEST['action']){
         $src=$_SESSION['INFOVIEWTABLE'][$_POST['dtuid']];
         unset($_POST['dtuid']);
         
-        $allowCreate=checkUserRoles($src['security']['module'],$src['security']['activity'],"CREATE");
-        if(!$allowCreate) {
-          printServiceMsg("Error, Record Creation is not permitted for you");
-          return;
+        // $allowCreate=checkUserRoles($src['security']['module'],$src['security']['activity'],"CREATE");
+        // if(!$allowCreate) {
+        //   printServiceMsg("Error, Record Creation is not permitted for you");
+        //   return;
+        // }
+
+        if(isset($src['policy_create']) && checkUserPolicy($src['policy_create'])) {
+          $allowCreate=true;
+        } else {
+          $allowCreate=false;
         }
         
         $formConfig=$src['form'];
@@ -393,10 +399,18 @@ switch($_REQUEST['action']){
         $refid=$_POST['refid'];
         unset($_POST['refid']);
         
-        $allowEdit=checkUserRoles($src['security']['module'],$src['security']['activity'],"EDIT");
-        if(!$allowEdit) {
-          printServiceMsg("Error, Record Updation is not permitted for you");
-          return;
+        // $allowEdit=checkUserRoles($src['security']['module'],$src['security']['activity'],"EDIT");
+        // if(!$allowEdit) {
+        //   printServiceMsg("Error, Record Updation is not permitted for you");
+        //   return;
+        // }
+
+        if(isset($src['policy_update']) && checkUserPolicy($src['policy_update'])) {
+          $allowEdit=true;
+        } elseif(isset($src['policy_create']) && checkUserPolicy($src['policy_create'])) {
+          $allowEdit=true;
+        } else {
+          $allowEdit=false;
         }
         
         $formConfig=$src['form'];
@@ -471,10 +485,16 @@ switch($_REQUEST['action']){
         $refid=$_POST['refid'];
         unset($_POST['refid']);
         
-        $allowDelete=checkUserRoles($src['security']['module'],$src['security']['activity'],"DELETE");
-        if(!$allowDelete) {
-          printServiceMsg("Error, Record Deletion is not permitted for you");
-          return;
+        // $allowDelete=checkUserRoles($src['security']['module'],$src['security']['activity'],"DELETE");
+        // if(!$allowDelete) {
+        //   printServiceMsg("Error, Record Deletion is not permitted for you");
+        //   return;
+        // }
+
+        if(isset($src['policy_delete']) && checkUserPolicy($src['policy_delete'])) {
+          $allowDelete=true;
+        } else {
+          $allowDelete=false;
         }
         
         $formConfig=$src['form'];
