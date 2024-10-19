@@ -44,6 +44,10 @@ if(isset($_ENV['INFOVIEW']) && isset($_ENV['INFOVIEW']['config']) && isset($_ENV
     $_REQUEST[$a]=$b;
   }
   if(is_numeric($_REQUEST['refid'])) $_REQUEST['refid']=md5($_REQUEST['refid']);
+
+  if(isset($_ENV['INFOVIEW_DATA'])) {
+    foreach($_ENV['INFOVIEW_DATA'] as $k=>$v) $_REQUEST[$k] = $v;
+  }
   
   switch(strtolower($_ENV['INFOVIEW']['type'])) {
     case "sql":
