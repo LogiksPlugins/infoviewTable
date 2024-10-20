@@ -14,6 +14,7 @@ switch($_REQUEST['action']){
           $uniLinks=$src['unilinks'];
         }
         if(!isset($src['dbkey'])) $src['dbkey'] = "app";
+        else $src['dbkey'] = _replace($src['dbkey']);
 
         $tbl1=current(explode(",",$src['table']));
         $sql=_db($src['dbkey'])->_selectQ($src['table'],$src['cols'],["{$tbl1}.blocked"=>'false']);
